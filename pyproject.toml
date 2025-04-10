@@ -1,0 +1,18 @@
+[project]
+name = "an-old-disappointment"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "dotenv>=0.9.9",
+    "livekit>=1.0.2",
+    "livekit-api>=1.0.2",
+    "opencv-python>=4.11.0.86",
+    "rich>=14.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "icecream>=2.1.4",
+    "ruff>=0.11.4",
+]
