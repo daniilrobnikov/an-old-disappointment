@@ -13,4 +13,11 @@ class VideoStream(ABC):
 
     @abstractmethod
     def get_latest_frame(self) -> NDArray | None:
+        """
+        Retrieves the last available frame from the video stream.
+        Blocks until a frame is available or the stream ends.
+
+        Returns:
+            The latest frame as a numpy array, or None if the stream has ended.
+        """
         pass

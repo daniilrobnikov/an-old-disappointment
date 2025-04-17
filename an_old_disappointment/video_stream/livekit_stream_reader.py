@@ -95,7 +95,7 @@ async def main(room: rtc.Room) -> None:
 
     @room.on("data_received")
     def on_data_received(data: rtc.DataPacket):
-        logging.info("received data from %s: %s", data.participant.identity, data.data)
+        logging.info("received resources from %s: %s", data.participant.identity, data.data)
 
     @room.on("connection_quality_changed")
     def on_connection_quality_changed(
