@@ -1,5 +1,5 @@
 # Script responsible for monitoring the robot workspace through a video stream
-
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -7,6 +7,9 @@ from pathlib import Path
 from numpy.typing import NDArray
 
 from ..object_detector.yolo_v7 import YOLOv7, Detection
+from ..utils import Stopwatch
+
+log = logging.getLogger(__name__)
 
 DEFAULT_DETECTOR_RESOURCES_DIRECTORY = (
     Path(__file__).parent / "../object_detector/resources"
@@ -50,7 +53,9 @@ class WorkspaceMonitor:
         """
 
         if not tracked_objects:
-            raise RuntimeError("tracked_classes must not be empty. Workspace monitor needs to know which objects to detect.")
+            raise RuntimeError(
+                "tracked_classes must not be empty. Workspace monitor needs to know which objects to detect."
+            )
         self.tracked_classes = tracked_objects
 
         # initialize the object detector
@@ -62,7 +67,10 @@ class WorkspaceMonitor:
     def process(self, frame: NDArray) -> WorkspaceState:
         """Process a frame and return the workspace state."""
 
-        detections = self.detector.detect(frame)
+        with Stopwatch() as sw:
+            # detect objects in the frame
+            detections = self.detector.detect(frame)
+            log.info(f"Detected {len(detections)} objects in {sw}")
 
         # only keep the detections of the tracked classes
         detections = [

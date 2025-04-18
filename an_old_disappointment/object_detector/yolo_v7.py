@@ -7,6 +7,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 import cv2
 import numpy as np
@@ -36,7 +37,12 @@ class Detection:
 
 
 class YOLOv7:
-    def __init__(self, weights_file_path: Path, hyperparameters_file_path: Path):
+    def __init__(
+        self,
+        weights_file_path: Path,
+        hyperparameters_file_path: Path,
+        device: Literal["cpu", "cuda", "mcp"] = "cuda",
+    ):
         """
         Initializes a YOLOv7 detector.
 
@@ -56,7 +62,7 @@ class YOLOv7:
         sys.path.append(str(models_directory))
 
         # load the model
-        self.device = torch.device("cpu")
+        self.device = torch.device(device)
         weights = torch.load(str(weights_file_path), weights_only=False)
         self.model = weights["model"]
         self.model = self.model.float().to(self.device)

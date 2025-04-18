@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from pathlib import Path
 
@@ -9,7 +8,7 @@ from an_old_disappointment.video_stream.file_video_stream import FileVideoStream
 from an_old_disappointment.workers.workspace_monitor import WorkspaceMonitor
 
 
-async def main():
+def main():
     # TODO: connect to the LiveKit room and fetch video_stream frames
 
     video_file_path = Path(__file__) / "../../tests/resources/workcell_test_video.mp4"
@@ -21,8 +20,8 @@ async def main():
     while True:
         frame = streamer.get_latest_frame()
         if frame is None:
-            await asyncio.sleep(0.1)
-            continue
+            # video stream is over
+            break
 
         cv2.imshow(str(streamer), frame)
         cv2.waitKey(1)
@@ -30,15 +29,13 @@ async def main():
         # TODO: process the frames (e.g., detect stuff and display using OpenCV)
         workspace_state = monitor.process(frame)
 
-        ic([i.class_name for i in workspace_state.intrusions])
-
         # TODO: send detection results to the MQTT endpoint
 
     pass
 
 
 def cli():
-    asyncio.run(main())
+    main()
 
 
 if __name__ == "__main__":
