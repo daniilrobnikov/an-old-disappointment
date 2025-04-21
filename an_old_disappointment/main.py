@@ -2,10 +2,12 @@ import logging
 from pathlib import Path
 
 import cv2
-from icecream import ic
 
-from an_old_disappointment.video_stream.file_video_stream import FileVideoStream
-from an_old_disappointment.workers.workspace_monitor import WorkspaceMonitor
+from an_old_disappointment.workers.workspace_state_publisher import (
+    WorkspaceStatePublisher,
+)
+from .video_stream.file_video_stream import FileVideoStream
+from .workers.workspace_monitor import WorkspaceMonitor
 
 
 def main():
@@ -16,6 +18,12 @@ def main():
     monitor = WorkspaceMonitor(
         tracked_objects=["person"],
     )
+    publisher = WorkspaceStatePublisher(
+        broker_address="localhost",
+        broker_port=1883,
+        topic="workspace/state",
+    )
+    publisher.connect()
 
     while True:
         frame = streamer.get_latest_frame()
@@ -26,7 +34,7 @@ def main():
         cv2.imshow(str(streamer), frame)
         cv2.waitKey(1)
 
-        # TODO: process the frames (e.g., detect stuff and display using OpenCV)
+        # process the frame
         workspace_state = monitor.process(frame)
 
         # TODO: send detection results to the MQTT endpoint

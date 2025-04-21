@@ -6,6 +6,8 @@ from signal import SIGINT, SIGTERM
 from typing import Union
 import os
 
+import cv2
+import numpy as np
 from dotenv import load_dotenv
 from livekit import api, rtc
 
@@ -58,14 +60,17 @@ async def main(room: rtc.Room) -> None:
     ):
         logging.info("track unpublished: %s", publication.sid)
 
+    _video_stream = None
+
     @room.on("track_subscribed")
     def on_track_subscribed(
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
     ):
-        logging.info("track subscribed: %s", publication.sid)
+        logging.info(f"track subscribed: {publication.sid} / {track.name}")
         if track.kind == rtc.TrackKind.KIND_VIDEO:
+            nonlocal _video_stream
             _video_stream = rtc.VideoStream(track)
             # video_stream is an async iterator that yields VideoFrame
         elif track.kind == rtc.TrackKind.KIND_AUDIO:
@@ -130,7 +135,7 @@ async def main(room: rtc.Room) -> None:
         logging.info("reconnected")
 
     # Generate access token
-    room_name = "50Robotics"
+    room_name = "50robotics-cameras"
     token = (
         api.AccessToken()
         .with_identity("an-old-disappointment")
@@ -148,6 +153,23 @@ async def main(room: rtc.Room) -> None:
 
     await asyncio.sleep(2)
     await room.local_participant.publish_data("hello world")
+
+    while _video_stream is None:
+        logging.info("Waiting for video stream...")
+        await asyncio.sleep(1)
+
+    async for event in _video_stream:
+        video_frame = event.frame
+        current_type = video_frame.type
+        frame_as_bgra = video_frame.convert(rtc.VideoBufferType.BGRA).data
+
+        # Convert to a NumPy array
+        frame_np = np.frombuffer(frame_as_bgra, dtype=np.uint8)
+        frame_np = frame_np.reshape((video_frame.height, video_frame.width, 4))
+
+        cv2.imshow("Camera Stream", frame_np)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
 
 if __name__ == "__main__":
