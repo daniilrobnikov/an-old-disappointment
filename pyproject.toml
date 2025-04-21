@@ -8,6 +8,7 @@ dependencies = [
     "livekit>=1.0.2",
     "livekit-api>=1.0.2",
     "opencv-python>=4.11.0.86",
+    "paho-mqtt>=2.1.0",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "rich>=14.0.0",
@@ -17,5 +18,6 @@ dependencies = [
 [dependency-groups]
 dev = [
     "icecream>=2.1.4",
+    "pytest-asyncio>=0.26.0",
     "ruff>=0.11.4",
 ]
