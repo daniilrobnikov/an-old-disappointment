@@ -6,7 +6,6 @@ from threading import Thread
 
 import cv2
 import numpy as np
-from icecream import ic
 from livekit import api, rtc
 from numpy.typing import NDArray
 
@@ -29,6 +28,8 @@ class LiveKitVideoStream(VideoStream):
         identity: str,
         room_name: str,
         track_name: str,
+        api_key: str,
+        api_secret: str,
         timeout: int = 5,
     ):
         self.url = str(url)
@@ -37,11 +38,14 @@ class LiveKitVideoStream(VideoStream):
         self.track_name = track_name
         self.timeout = timeout
 
+        self._api_key = api_key
+        self._api_secret = api_secret
+
         self._video_stream = None
         self._latest_frame: NDArray | None = self._WAITING_FOR_FRAME_FLAG
 
         # LiveKit SDK is async and needs an asyncio loop of its own to run
-        # threfore, we are rtunning it in a separate thread
+        # therefore, we are running it in a separate thread
         self._handler_thread: Thread | None = None
         self._frame_lock = threading.Lock()
 
@@ -71,7 +75,9 @@ class LiveKitVideoStream(VideoStream):
         Coroutine responsible for grabbing frames from the video stream.
         """
         try:
-            token = get_room_join_token(self.room_name, self.identity)
+            token = get_room_join_token(
+                self.room_name, self.identity, self._api_key, self._api_secret
+            )
 
             log.info(
                 f"Joining room '{self.room_name}' with identity '{self.identity}'..."
@@ -127,19 +133,33 @@ def frame_to_cv2(frame: rtc.VideoFrame) -> NDArray:
     return buffer
 
 
-def get_room_join_token(room: str, identity: str) -> str:
+def get_room_join_token(
+    room: str,
+    identity: str,
+    api_key: str,
+    api_secret: str,
+) -> str:
     """
     Generates a JWT token for joining a LiveKit room.
 
     Args:
         room: The name of the room to join.
         identity: The identity of the participant (this client).
+        api_key: The API key for the LiveKit server.
+        api_secret: The API secret for the LiveKit server.
 
     Returns:
         A JWT token for joining the room.
     """
     grant = api.VideoGrants(room=room, room_join=True)
-    token = api.AccessToken().with_grants(grant).with_identity(identity)
+    token = (
+        api.AccessToken(
+            api_key=api_key,
+            api_secret=api_secret,
+        )
+        .with_grants(grant)
+        .with_identity(identity)
+    )
     return token.to_jwt()
 
 

@@ -1,55 +1,46 @@
-import os
-from dataclasses import field, dataclass
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-def from_env(name: str) -> str:
-    """
-    Reads the environment variable with the given name and returns its value.
-    """
-    value = os.environ.get(name)
-    if value is None:
-        raise ValueError(f"Environment variable {name} is not set")
-    return value
-
-
-@dataclass
-class LiveKitConfig:
+class LiveKitConfig(BaseModel):
     identity: str
     """Identity of this client"""
     room_name: str
     """Name of the room to connect to"""
     track_name: str
     """Name of the track in the room to subscribe to"""
-    url: str = field(default_factory=lambda: from_env("LIVEKIT_URL"))
-    """URL of the LiveKit server. Initialized from LIVEKIT_URL env var if not provided explicitly"""
-    api_key: str = field(default_factory=lambda: from_env("LIVEKIT_API_KEY"))
-    """API key for the LiveKit server. Initialized from LIVEKIT_API_KEY env var if not provided explicitly"""
-    api_secret: str = field(default_factory=lambda: from_env("LIVEKIT_API_SECRET"))
-    """API secret for the LiveKit server. Initialized from LIVEKIT_API_SECRET env var if not provided explicitly"""
+    url: str
+    """URL of the LiveKit server"""
+    api_key: str
+    """API key for the LiveKit server"""
+    api_secret: str
+    """API secret for the LiveKit server"""
 
 
-@dataclass
-class MqttConfig:
+class MqttConfig(BaseModel):
     broker: str
     """Address of the MQTT broker"""
     port: int
     """Port of the MQTT broker"""
     topic: str
     """Topic to publish the workspace state to"""
-    username: str = field(default_factory=lambda: from_env("MQTT_USERNAME"))
-    """Username for the MQTT broker. Initialized from MQTT_USERNAME env var if not provided explicitly"""
-    password: str = field(default_factory=lambda: from_env("MQTT_PASSWORD"))
-    """Password for the MQTT broker. Initialized from MQTT_PASSWORD env var if not provided explicitly"""
+    username: str
+    """Username for the MQTT broker"""
+    password: str
+    """Password for the MQTT broker"""
 
 
-@dataclass
-class MonitorConfig:
-    tracked_objects: list[str] = field(default_factory=list)
+class MonitorConfig(BaseModel):
+    tracked_objects: list[str]
     """List of object classes to track in the workspace"""
 
 
-@dataclass
-class Config:
+class Config(BaseSettings):
+
+    class Config:  # <- pydantic's BaseSettings configuration
+        env_file = ".env"
+        env_nested_delimiter = "."
+
     livekit: LiveKitConfig
     mqtt: MqttConfig
     monitor: MonitorConfig

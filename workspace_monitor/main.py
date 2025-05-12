@@ -1,11 +1,13 @@
 import logging
+import os
 
 import cv2
 import tyro
 from dotenv import load_dotenv
 from rich.logging import RichHandler
+from rich.traceback import install
 
-from workspace_monitor.config import Config, LiveKitConfig, MqttConfig, MonitorConfig
+from workspace_monitor.config import Config
 from workspace_monitor.video_stream.livekit_video_stream import LiveKitVideoStream
 from workspace_monitor.workers.workspace_state_publisher import (
     WorkspaceStatePublisher,
@@ -26,6 +28,8 @@ def main(cfg: Config):
         identity=cfg.livekit.identity,
         room_name=cfg.livekit.room_name,
         track_name=cfg.livekit.track_name,
+        api_key=cfg.livekit.api_key,
+        api_secret=cfg.livekit.api_secret,
         timeout=5,
     )
     streamer.start()
@@ -79,7 +83,9 @@ def cli():
 
     load_dotenv()
 
-    cfg = tyro.cli(Config)
+    default_cfg = Config()  # pyright: ignore [reportCallIssue]
+
+    cfg = tyro.cli(Config, default=default_cfg)
 
     main(cfg)
 
