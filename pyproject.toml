@@ -14,6 +14,7 @@ dependencies = [
     "opencv-python>=4.11.0.86",
     "paho-mqtt>=2.1.0",
     "pydantic>=2.11.4",
+    "pydantic-settings>=2.9.1",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "rich>=14.0.0",
