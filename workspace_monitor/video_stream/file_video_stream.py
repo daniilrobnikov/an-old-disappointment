@@ -7,7 +7,7 @@ from icecream import ic
 from numpy._typing import NDArray
 
 
-from an_old_disappointment.video_stream.base import VideoStream
+from workspace_monitor.video_stream.base import VideoStream
 
 log = logging.getLogger(__name__)
 

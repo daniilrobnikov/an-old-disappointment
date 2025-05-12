@@ -23,7 +23,7 @@ def test_livekit_video_stream() -> None:
         "LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET must be set in the environment variables."
     )
 
-    from an_old_disappointment.video_stream.livekit_video_stream import (
+    from workspace_monitor.video_stream.livekit_video_stream import (
         LiveKitVideoStream,
     )
 

@@ -5,12 +5,13 @@ import json
 import logging
 import time
 
+import cv2
 from PIL import Image
 from numpy.typing import NDArray
 from paho.mqtt.client import Client as MqttClient
 from pydantic import BaseModel
 
-from an_old_disappointment.object_detector.utils import (
+from workspace_monitor.object_detector.utils import (
     BoundingBox,
     mask_to_bounding_box,
     normalize_bounding_box,
@@ -54,6 +55,7 @@ def encode_frame_base64_jpeg(frame: NDArray) -> dict:
     Encodes the image frame as a base64 string (JPEG).
     """
     with io.BytesIO() as output:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(frame)
         img.save(output, format="JPEG")
         data = output.getvalue()
@@ -116,7 +118,9 @@ class WorkspaceStatePublisher:
         while not self.client.is_connected():
             if time.perf_counter() - start_time > timeout:
                 self.client.loop_stop()
-                raise TimeoutError(f"MQTT connection to '{self.broker_address}:{self.broker_port}' timed out after {timeout} seconds")
+                raise TimeoutError(
+                    f"MQTT connection to '{self.broker_address}:{self.broker_port}' timed out after {timeout} seconds"
+                )
 
             log.debug("Waiting for MQTT client to connect...")
 
@@ -134,13 +138,13 @@ class WorkspaceStatePublisher:
         for i in state.intrusions:
             # mask to normalized bounding box
             box = mask_to_bounding_box(i.mask)
-            box = normalize_bounding_box(box, (w, h))
+            box_normalized = normalize_bounding_box(box, (w, h))
 
             # convert to a serializable model
             intrusion = BoxDetection(
                 class_name=i.class_name,
                 confidence=i.confidence,
-                box=box,
+                box=box_normalized,
             )
             intrusions.append(intrusion)
 
@@ -154,6 +158,7 @@ class WorkspaceStatePublisher:
 
         # publish
         data = state_message.model_dump(mode="json")
+        data = {"value": data}
         self.client.publish(
             self.topic,
             payload=json.dumps(data),

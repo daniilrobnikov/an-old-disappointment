@@ -2,12 +2,12 @@ from pathlib import Path
 
 from icecream import ic
 
-from an_old_disappointment.object_detector.utils import (
+from workspace_monitor.object_detector.utils import (
     mask_to_bounding_box,
     normalize_bounding_box,
 )
-from an_old_disappointment.video_stream.file_video_stream import FileVideoStream
-from an_old_disappointment.workers.workspace_monitor import WorkspaceMonitor
+from workspace_monitor.video_stream.file_video_stream import FileVideoStream
+from workspace_monitor.workers.workspace_monitor import WorkspaceMonitor
 
 
 def test_file_video_stream(workcell_test_video: Path) -> None:
