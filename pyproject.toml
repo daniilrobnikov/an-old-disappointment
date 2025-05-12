@@ -2,22 +2,31 @@
 name = "an-old-disappointment"
 version = "0.1.0"
 description = "Add your description here"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "dotenv>=0.9.9",
     "livekit>=1.0.2",
     "livekit-api>=1.0.2",
     "opencv-python>=4.11.0.86",
     "paho-mqtt>=2.1.0",
+    "pydantic>=2.11.4",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
     "rich>=14.0.0",
     "torchvision>=0.21.0",
+    "tyro>=0.9.20",
 ]
 
 [dependency-groups]
 dev = [
     "icecream>=2.1.4",
+    "pytest>=8.3.5",
     "pytest-asyncio>=0.26.0",
     "ruff>=0.11.4",
 ]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s %(name)-40.40s %(levelname)s %(message)s"
+addopts = "--color=yes"
