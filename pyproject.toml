@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "an-old-disappointment"
+name = "workspace-monitor"
 version = "0.1.0"
-description = "Add your description here"
+description = "Tool to monitor a LiveKit video stream for objects of interest and publish the detections to an MQTT broker"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "dotenv>=0.9.9",
@@ -16,6 +20,9 @@ dependencies = [
     "torchvision>=0.21.0",
     "tyro>=0.9.20",
 ]
+
+[project.scripts]
+workspace-monitor = "workspace_monitor.main:cli"
 
 [dependency-groups]
 dev = [
