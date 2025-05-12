@@ -70,7 +70,7 @@ class WorkspaceMonitor:
         with Stopwatch() as sw:
             # detect objects in the frame
             detections = self.detector.detect(frame)
-            log.info(f"Detected {len(detections)} objects in {sw}")
+            log.debug(f"Detected {len(detections)} objects in {sw}")
 
         # only keep the detections of the tracked classes
         detections = [
