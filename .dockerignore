@@ -1,0 +1,11 @@
+# dev directories
+test
+venv
+
+# dev files
+.dockerignore
+.flake8
+.gitignore
+.isort.cfg
+.pre-commit-config.yaml
+README.md
