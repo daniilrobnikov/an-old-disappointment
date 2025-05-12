@@ -12,6 +12,13 @@ class VideoStream(ABC):
         return f"Video stream {self.__hash__()}"
 
     @abstractmethod
+    def start(self) -> None:
+        """
+        Starts the video stream.
+        """
+        pass
+
+    @abstractmethod
     def get_latest_frame(self) -> NDArray | None:
         """
         Retrieves the last available frame from the video stream.

@@ -30,9 +30,16 @@ class FileVideoStream(VideoStream):
     def current_time(self) -> float:
         return time.perf_counter()
 
-    def get_latest_frame(self) -> NDArray | None:
+    def start(self) -> None:
+        """
+        Starts the video stream.
+        """
         if self._capture is None:
             self._start_capture()
+
+    def get_latest_frame(self) -> NDArray | None:
+        if self._capture is None:
+            raise RuntimeError(f"File video stream is not started, please call {self.start()}() first")
 
         frame_duration = 1 / self._fps
         next_frame_time = self._last_frame_time + frame_duration

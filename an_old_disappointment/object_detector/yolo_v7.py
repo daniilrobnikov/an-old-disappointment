@@ -22,6 +22,21 @@ from .models.utils.general import non_max_suppression_mask_conf
 logger = logging.getLogger(__name__)
 
 
+def auto_select_torch_device() -> Literal["cpu", "cuda", "mps"]:
+    """
+    Automatically selects the best available device for PyTorch.
+
+    Returns:
+        The device type as a string: "cpu", "cuda", or "mps".
+    """
+    if torch.backends.mps.is_available():
+        return "mps"
+    elif torch.cuda.is_available():
+        return "cuda"
+    else:
+        return "cpu"
+
+
 @dataclass
 class Detection:
     """
@@ -41,7 +56,7 @@ class YOLOv7:
         self,
         weights_file_path: Path,
         hyperparameters_file_path: Path,
-        device: Literal["cpu", "cuda", "mcp"] = "cuda",
+        device: Literal["cpu", "cuda", "mps"] = auto_select_torch_device(),
     ):
         """
         Initializes a YOLOv7 detector.
