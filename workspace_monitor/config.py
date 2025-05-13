@@ -24,9 +24,9 @@ class MqttConfig(BaseModel):
     """Port of the MQTT broker"""
     topic: str
     """Topic to publish the workspace state to"""
-    username: str
+    username: str | None = None
     """Username for the MQTT broker"""
-    password: str
+    password: str | None = None
     """Password for the MQTT broker"""
 
 

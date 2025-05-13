@@ -1,11 +1,9 @@
 import logging
-import os
 
 import cv2
 import tyro
 from dotenv import load_dotenv
 from rich.logging import RichHandler
-from rich.traceback import install
 
 from workspace_monitor.config import Config
 from workspace_monitor.video_stream.livekit_video_stream import LiveKitVideoStream
@@ -54,7 +52,13 @@ def main(cfg: Config):
             break
 
         # process the frame
-        workspace_state = monitor.process(frame)
+        try:
+            workspace_state = monitor.process(frame)
+        except RuntimeError as e:
+            # there's a rare exception when torch fails to process YOLOv7 model output - just try again with the next frame
+            log.error(f"Error processing frame: {e}")
+            continue
+
         if len(workspace_state.intrusions) <= 0:
             log.info("Processed workspace state: no intrusions")
         else:
